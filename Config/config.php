@@ -22,6 +22,16 @@ return [
                     'mautic.helper.sms',
                 ],
             ],
+        	'mautic.sms.formbundle.subscriber' => [
+        		'class' => 'MauticPlugin\InfoBipSmsBundle\EventListener\FormSubscriber',
+        		'arguments' => [
+        			'mautic.helper.core_parameters',
+        			'mautic.lead.model.lead',
+        			'mautic.sms.model.sms',
+        			'mautic.sms.api',
+        			'mautic.helper.sms',
+        		],
+        	],
             'mautic.sms.configbundle.subscriber' => [
                 'class' => 'Mautic\SmsBundle\EventListener\ConfigSubscriber',
             ],

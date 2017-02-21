@@ -18,7 +18,7 @@ class SmsInfoBipApi extends AbstractSmsApi
 	private $username;
 	private $password;
 	
-    public function __construct(TrackableModel $pageTrackableModel, MauticFactory $factory, \Services_Twilio $client, PhoneNumberHelper $phoneNumberHelper, $sendingPhoneNumber, $username, $password)
+    public function __construct(TrackableModel $pageTrackableModel = null, MauticFactory $factory, \Services_Twilio $client = null, PhoneNumberHelper $phoneNumberHelper = null, $sendingPhoneNumber, $username, $password)
     {
         $this->client = $client;
         parent::__construct($pageTrackableModel);
@@ -31,7 +31,7 @@ class SmsInfoBipApi extends AbstractSmsApi
     {
 		$number = '+55' . $number;
 		
-    	$url = "https://api.infobip.com/sms/1/text/single";
+    	$url = "http://api.infobip.com/sms/1/text/single";
 		$curl = curl_init();
 		
 		$headers = [
@@ -47,12 +47,12 @@ class SmsInfoBipApi extends AbstractSmsApi
 		];
 		
 		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_VERBOSE, 1);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-		
-		curl_exec($curl);
+		$response = curl_exec($curl);
 		curl_close($curl);
-		
-        return true;
+
+		return $response;
     }
 }
