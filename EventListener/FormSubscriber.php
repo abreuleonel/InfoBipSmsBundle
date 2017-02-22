@@ -77,30 +77,38 @@ class FormSubscriber extends CommonSubscriber
     
     public function onFormSubmit(SubmissionEvent $event) 
     {
-    	$data =  $event->getPost();
-    	$properties = $event->getForm()->getActions()->first()->getProperties();
-    	$currentLead = $event->getLead();
-    	$smsModel = $this->smsModel;
+    	$type = $event->getForm()->getActions()->first()->getType();
     	
-    	foreach($properties as $k => $smsId) {
-    		$sms   = $smsModel->getEntity($smsId);
-    		
-    		$smsEvent = new SmsSendEvent($sms->getMessage(), $currentLead);
-    		$smsEvent->setSmsId($smsId);
-    		
-    		$this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
-    		
-    		$tokenEvent = $this->dispatcher->dispatch(
-    				SmsEvents::TOKEN_REPLACEMENT,
-    				new TokenReplacementEvent(
-    						$smsEvent->getContent(),
-    						$currentLead,
-    						['channel' => ['sms', $sms->getId()]]
-    					)
-    				);
-    		
-    		$response = $this->smsApi->sendSms($data['phone'], $tokenEvent->getContent());
+    	if($type == 'sms.send.lead') {
+	    	$data =  $event->getPost();
+	    	$properties = $event->getForm()->getActions()->first()->getProperties();
+	    	$currentLead = $event->getLead();
+	    	$smsModel = $this->smsModel;
+	    	
+	    	foreach($properties as $k => $smsId) {
+	    		try {
+		    		$sms   = $smsModel->getEntity($smsId);
+		    		
+		    		$smsEvent = new SmsSendEvent($sms->getMessage(), $currentLead);
+		    		$smsEvent->setSmsId($smsId);
+		    		
+		    		$this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
+		    		
+		    		$tokenEvent = $this->dispatcher->dispatch(
+		    				SmsEvents::TOKEN_REPLACEMENT,
+		    				new TokenReplacementEvent(
+		    						$smsEvent->getContent(),
+		    						$currentLead,
+		    						['channel' => ['sms', $sms->getId()]]
+		    					)
+		    				);
+		    		
+		    		$response = $this->smsApi->sendSms($data['phone'], $tokenEvent->getContent());
+	    		} catch(Exception $e) {
+	    			return $e->getMessage();
+	    		}
+	    	}
     	}
-    	print_r($response);
+ 		return true;
     }
 }
