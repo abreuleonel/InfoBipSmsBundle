@@ -77,37 +77,36 @@ class FormSubscriber extends CommonSubscriber
     
     public function onFormSubmit(SubmissionEvent $event) 
     {
-    	foreach($event->getForm()->getActions() as $action) {
-    		$type = $action->getType();
-	    	if($type == 'sms.send.lead') {
-		    	$data =  $event->getPost();
-		    	$properties = $event->getForm()->getActions()->first()->getProperties();
-		    	$currentLead = $event->getLead();
-		    	$smsModel = $this->smsModel;
-		    	
-		    	foreach($properties as $k => $smsId) {
-		    		try {
-			    		$sms   = $smsModel->getEntity($smsId);
-			    		
-			    		$smsEvent = new SmsSendEvent($sms->getMessage(), $currentLead);
-			    		$smsEvent->setSmsId($smsId);
-			    		
-			    		$this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
-			    		
-			    		$tokenEvent = $this->dispatcher->dispatch(
-			    				SmsEvents::TOKEN_REPLACEMENT,
-			    				new TokenReplacementEvent(
-			    						$smsEvent->getContent(),
-			    						$currentLead,
-			    						['channel' => ['sms', $sms->getId()]]
-			    					)
-			    				);
-			    		
-			    		$response = $this->smsApi->sendSms($data['phone'], $tokenEvent->getContent());
-		    		} catch(Exception $e) {
-		    			return $e->getMessage();
-		    		}
-		    	}
+    	$type = $event->getForm()->getActions()->first()->getType();
+    	
+    	if($type == 'sms.send.lead') {
+	    	$data =  $event->getPost();
+	    	$properties = $event->getForm()->getActions()->first()->getProperties();
+	    	$currentLead = $event->getLead();
+	    	$smsModel = $this->smsModel;
+	    	
+	    	foreach($properties as $k => $smsId) {
+	    		try {
+		    		$sms   = $smsModel->getEntity($smsId);
+		    		
+		    		$smsEvent = new SmsSendEvent($sms->getMessage(), $currentLead);
+		    		$smsEvent->setSmsId($smsId);
+		    		
+		    		$this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
+		    		
+		    		$tokenEvent = $this->dispatcher->dispatch(
+		    				SmsEvents::TOKEN_REPLACEMENT,
+		    				new TokenReplacementEvent(
+		    						$smsEvent->getContent(),
+		    						$currentLead,
+		    						['channel' => ['sms', $sms->getId()]]
+		    					)
+		    				);
+		    		
+		    		$response = $this->smsApi->sendSms($data['phone'], $tokenEvent->getContent());
+	    		} catch(Exception $e) {
+	    			return $e->getMessage();
+	    		}
 	    	}
     	}
  		return true;
