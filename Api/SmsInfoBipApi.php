@@ -12,19 +12,19 @@ namespace MauticPlugin\InfoBipSmsBundle\Api;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\InfoBipSmsBundle\Api\AbstractSmsApi;
 
 class SmsInfoBipApi extends AbstractSmsApi
 {
 	private $username;
 	private $password;
 	
-    public function __construct(TrackableModel $pageTrackableModel = null, MauticFactory $factory, \Services_Twilio $client = null, PhoneNumberHelper $phoneNumberHelper = null, $sendingPhoneNumber, $username, $password)
+    public function __construct(TrackableModel $pageTrackableModel = null, MauticFactory $factory, PhoneNumberHelper $phoneNumberHelper = null, $sendingPhoneNumber, $username, $password)
     {
-        $this->client = $client;
-        parent::__construct($pageTrackableModel);
-        
         $this->username = $username;
         $this->password = $password;
+
+        parent::__construct($pageTrackableModel);
     }
 
     public function sendSms($number, $content)

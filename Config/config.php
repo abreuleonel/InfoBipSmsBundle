@@ -16,11 +16,8 @@ return [
                 'class'     => 'MauticPlugin\InfoBipSmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.lead.model.lead',
                     'mautic.sms.model.sms',
-                    'mautic.sms.api',
-                    'mautic.helper.sms',
-                ],
+                ]
             ],
         	'mautic.sms.formbundle.subscriber' => [
         		'class' => 'MauticPlugin\InfoBipSmsBundle\EventListener\FormSubscriber',
@@ -77,7 +74,7 @@ return [
         ],
         'helpers' => [
             'mautic.helper.sms' => [
-                'class'     => 'Mautic\SmsBundle\Helper\SmsHelper',
+                'class'     => 'MauticPlugin\InfoBipSmsBundle\Helper\SmsHelper',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
@@ -95,7 +92,6 @@ return [
     				'arguments' => [ 
     						'mautic.page.model.trackable',
     						'mautic.factory', 
-    						'mautic.twilio.service', 
     						'mautic.helper.phone_number', 
     						'%mautic.sms_sending_phone_number%',
     						'%mautic.sms_username%',
@@ -106,9 +102,12 @@ return [
         ],
         'models' => [
             'mautic.sms.model.sms' => [
-                'class'     => 'Mautic\SmsBundle\Model\SmsModel',
+                'class'     => 'MauticPlugin\InfoBipSmsBundle\Model\SmsModel',
                 'arguments' => [
                     'mautic.page.model.trackable',
+                	'mautic.lead.model.lead',
+                	'mautic.channel.model.queue',
+                	'mautic.sms.api'
                 ],
             ],
         ],
